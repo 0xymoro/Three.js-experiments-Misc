@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jerry Meng</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script>
+        var greetings = [
+            "System.out.println(\"Hi there!\");",
+            "cout << \"Howdy!\" << endl;",
+            "print(\"How do you do?\")",
+            "echo \"Good day to you!\"",
+            "&ltp&gtGreetings.&lt/p&gt",
+            "p#greet::before{content: \"Hi!\";}",
+            "alert(\"Hey!\");",
+            "$(\"#greet\").text(\"What's up?\");",
+            "PRINT 'Good to see you!'"
+        ]
+        $(document).ready(function(){
+            $("#overview").height(($(window).height() - $("#codeBlock").height()) / 2);
+            $("#overview").css({
+                "top": $(window).height()/2
+            });
+            var greetingCount = 0;
+            typing();
+            function typing() {
+                $("#code").html(greetings[greetingCount % greetings.length] + "<span class=\"blinking\">_</span>");
+                $("#code").css({"overflow": "hidden"});
+                $("#code").removeClass("detyping");
+                $("#code").addClass("typing");
+                window.setTimeout(detyping, 10000);
+            }
+
+            function detyping(){
+                $("#code").removeClass("typing");
+                $("#code").addClass("detyping");
+                greetingCount ++;
+                window.setTimeout(rest, 3000);
+            }
+
+            function rest(){
+                $("#code").html("<span class=\"blinking\">_</span>");
+                $("#code").css({"overflow": "visible"});
+                window.setTimeout(typing, 2000);
+            }
+
+
+        });
+
+
+
+
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body{
+            margin: 0;
+            padding: 0;
+            /*Background taken from Google Images under free reuse license*/
+            background: url("homeBackground.jpg") no-repeat center center fixed;
+            background-size: cover;
+        }
+        #codeBlock{
+            width: 650px;
+            height: 100px;
+            position: absolute;
+            top: -150px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: auto;
+            border: 5px solid black;
+            overflow: hidden;
+            background-color: black;
+            border-radius: 5px;
+            z-index: 1;
+        }
+        #overview{
+            width: 70%;
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: auto;
+            overflow: visible;
+            text-align: center;
+        }
+        #overview p{
+            font-family: "Optima";
+            font-size: 20px;
+        }
+        #code{
+            font-family: "Courier";
+            font-size: 30px;
+            color: lime;
+            width: 600px;
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0;
+            padding:25px 0 50px 5px;
+        }
+        p.typing{ /* inspired by Azik Samarkandiy's tutorial on typing animation */
+            animation: type 3s steps(40, end);
+        }
+
+        p.detyping{
+            animation: detype 3s steps(40, start) forwards;
+        }
+
+        @keyframes type{
+            from { width: 0; }
+        }
+
+        @keyframes detype{
+            to { width: 0; }
+        }
+
+        span.blinking{/* insired by Artem Gordinsky's tutorial on blinking cursors */
+            animation: blink 1s step-end infinite;
+            font-family: "Courier";
+            font-size: 30px;
+            color: lime;
+        }
+        @keyframes blink{
+            from, to {
+                color: transparent;
+            }
+            50% {
+                color: lime;
+            }
+        }
+
+
+
+
+
+    </style>
+</head>
+<body>
+    <div id="codeBlock">
+        <p class="code detyping" id="code"></p>
+    </div>
+
+    <div id="overview">
+        <p>
+            <strong>Welcome to my self-coded and self-designed personal website!</strong><br/>I am an incoming freshman
+            at Stanford, with interests and experience in technology, computer science, robotics, and entrepreneurship.
+            I also commit myself to playing the violin, and have had experiences in playing with and leading large
+            orchestras as well as organizing and managing small chamber groups.
+        </p>
+        <p>
+            This site is both a detailed list of my background and experiences, as well as a playground for my
+            web designs.  I hope you enjoy your stay!
+        </p>
+    </div>
+
+
+
+
+</body>
+</html>

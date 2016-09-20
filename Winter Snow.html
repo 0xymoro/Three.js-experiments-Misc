@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Winter</title>
+    <style>
+        body {
+            margin: 0px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r72/three.min.js"></script>
+<script>
+    var camera;
+    var scene;
+    var renderer;
+
+    var clock;
+    var deltaTime;
+
+    var particleSystem;
+
+    var fallingRates = [];
+
+    var backgroundScene;
+    var backgroundCamera;
+    var backgroundMesh;
+    var texture;
+
+    init();
+    animate();
+
+    function init(){
+        clock = new THREE.Clock(true);
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 1, 1000);
+        camera.position.z = 300;
+
+        var light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(1, -1, 1).normalize();
+        scene.add(light);
+
+        particleSystem = createParticleSystem();
+        createFallingRates();
+        scene.add(particleSystem);
+
+        createBackground();
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        window.addEventListener("resize", onWindowResize, false);
+
+        render();
+    }
+
+    function createParticleSystem(){
+        var particleCount = 2000;
+        var particles = new THREE.Geometry();
+        for (var p = 0; p < particleCount; p++){
+            var x = Math.random() * 800 - 400;
+            var y = Math.random() * 800 - 400;
+            var z = Math.random() * 400 - 200;
+
+            var particle = new THREE.Vector3(x, y, z);
+
+            particles.vertices.push(particle);
+        }
+        var particleMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 8,
+            map: THREE.ImageUtils.loadTexture("Vectors/snowflake.png"),
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+        });
+
+        particleSystem = new THREE.Points(particles, particleMaterial);
+        return particleSystem;
+
+    }
+
+    function animateParticles(){
+        var verts = particleSystem.geometry.vertices;
+        for (var i = 0; i < verts.length; i ++){
+            var vert = verts[i];
+            if (vert.y < -400){
+                vert.y = Math.random() * 800 - 400;
+                vert.x = Math.random() * 800 - 400;
+                vert.z = Math.random() * 400 - 200;
+            }
+            vert.y -= 10*deltaTime;
+            vert.x += deltaTime * fallingRates[i];
+            vert.z += deltaTime * fallingRates[i + verts.length];
+        }
+        particleSystem.geometry.verticesNeedUpdate = true;
+    }
+
+    function createFallingRates(){
+        //create x and z fall rates, x in first half or array
+        //and z in second half
+        var verts = particleSystem.geometry.vertices;
+        for (var i = 0; i < verts.length*2; i++){
+            fallingRates.push(Math.random()*6 - 3);
+        }
+    }
+
+    function createBackground(){
+        //background courtesy of ThisIsSparta on StackOverflow
+        texture = THREE.ImageUtils.loadTexture('backgrounds/winter.jpg');
+        backgroundMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(2, 2, 0),
+                new THREE.MeshBasicMaterial({
+                    map: texture
+                }));
+
+        backgroundMesh.material.depthTest = false;
+        backgroundMesh.material.depthWrite = false;
+
+        // Create background scene
+        backgroundScene = new THREE.Scene();
+        backgroundCamera = new THREE.Camera();
+        backgroundScene.add(backgroundCamera);
+        backgroundScene.add(backgroundMesh);
+    }
+
+
+    function render(){
+        renderer.autoClear = false;
+        renderer.clear();
+        renderer.render(backgroundScene, backgroundCamera);
+        renderer.render(scene, camera);
+    }
+
+    function animate(){
+        deltaTime = clock.getDelta();
+
+        animateParticles();
+
+        render();
+        requestAnimationFrame(animate);
+
+    }
+
+    function onWindowResize(){
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        render();
+    }
+
+</script>
+</body>
+</html>
